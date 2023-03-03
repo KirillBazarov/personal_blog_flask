@@ -6,8 +6,13 @@ from DB.Models import Post
 @app.route("/")
 def index():
     posts = Post.query.all()
-    print(posts)
     return render_template('index.html', posts=posts)
+
+@app.route('/post/<slug>')
+def post_detail(slug):
+    post = Post.get_by_slug(slug)
+    return render_template('post_detail.html', post=post)
+
 
 @app.errorhandler(404)
 def page_not_found(e):

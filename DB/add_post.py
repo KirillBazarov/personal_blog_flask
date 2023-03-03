@@ -15,8 +15,10 @@ from Models import Post
 
 
 
+
+
 # Сохранение изменений в базе данных
 with app.app_context():
-    post2 = Post(title='Заголовок 2')
-    db.session.add(post2)
+    post = Post(title='4', content="ну тут что-то важное про этот пост")
+    db.session.add(post)
     db.session.commit()

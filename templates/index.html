@@ -3,9 +3,8 @@
 {% block content %}
 {% for post in posts%}
 <div class="article">
-
   <h1>{{post.title}}</h1>
-  <a href="{{post.url}}" class="button">Читать статью</a>
+  <a href="post/{{post.slug}}" class="button">Читать статью</a>
 </div>
 {%endfor%}
 {% endblock %}
