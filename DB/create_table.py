@@ -1,10 +1,5 @@
-import datetime
+from Models import *
 
-from cfg import *
-
-
-
-# подтверждаем транзакцию
 
 with app.app_context():
     db.create_all()

@@ -1,18 +1,22 @@
 from cfg import *
+from Models import Post
+#
+#
+# posts = [
+#     Post(title='Заголовок 1'),
+#     Post(title='Заголовок 2')
+# ]
+#
+# with app.app_context():
+#     db.session.add_all(posts)
+#     db.session.commit()
+
+# Создание новой записи
 
 
-class PostTest(db.Model):
-    __tablename__ = 'test'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
-    url = db.Column(db.String(50), nullable=False)
 
-
-posts = [
-    PostTest(title='Заголовок 1', url='https://example.com/1'),
-    PostTest(title='Заголовок 2', url='https://example.com/2')
-]
-
+# Сохранение изменений в базе данных
 with app.app_context():
-    db.session.add_all(posts)
+    post2 = Post(title='Заголовок 2')
+    db.session.add(post2)
     db.session.commit()
