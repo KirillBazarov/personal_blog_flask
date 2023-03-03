@@ -4,5 +4,27 @@
     <div class="article">
   <h1>{{post.title}}</h1>
         <h2>{{post.content}}</h2>
+       <h2>{{post.id}}</h2>
+
 </div>
+
+<h2>Comments</h2>
+  <ul>
+    {% for comment in post.comments %}
+      <li>
+        <p><strong>{{ comment.name }}:</strong> {{ comment.body }}</p>
+        <p><small>{{ comment.timestamp }}</small></p>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h3>Add Comment</h3>
+  <form method="post">
+    {{ form.csrf_token }}
+    <div class="form-group">
+      {{ form.body.label }} {{ form.body }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
 {% endblock %}

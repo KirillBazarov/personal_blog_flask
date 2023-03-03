@@ -1,17 +1,27 @@
 from flask import render_template
 from cfg import *
 from DB.Models import Post
+from forms import CommentForm
 
+@app.route('/post/<slug>')
+def show_post(slug):
+    # получить пост из базы данных по слагу
+    post = Post.query.filter_by(slug=slug).first()
+
+    # создать форму для комментария
+    form = CommentForm()
+
+    return render_template('post_detail.html', post=post, form=form)
 
 @app.route("/")
 def index():
     posts = Post.query.all()
     return render_template('index.html', posts=posts)
 
-@app.route('/post/<slug>')
-def post_detail(slug):
-    post = Post.get_by_slug(slug)
-    return render_template('post_detail.html', post=post)
+# @app.route('/post/<slug>')
+# def post_detail(slug):
+#     post = Post.get_by_slug(slug)
+#     return render_template('post_detail.html', post=post)
 
 
 @app.errorhandler(404)

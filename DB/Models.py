@@ -1,14 +1,7 @@
-from cfg import *
 from slugify import slugify
-from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, Length
 
-class CommentForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=30)])
-    email = StringField('Email', validators=[DataRequired(), Length(min=2, max=50)])
-    body = TextAreaField('Comment', validators=[DataRequired()])
-    submit = SubmitField('Post Comment')
+from cfg import *
+
 class Post(db.Model):
     __tablename__ = 'posts_slug'
     id = db.Column(db.Integer, primary_key=True)
@@ -24,3 +17,4 @@ class Post(db.Model):
     @classmethod
     def get_by_slug(cls, slug):
         return cls.query.filter_by(slug=slug).first()
+
