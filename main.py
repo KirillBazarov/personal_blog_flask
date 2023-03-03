@@ -23,7 +23,24 @@ class User(db.Model):
     def __repr__(self):
         return f"<User(id={self.id}, username={self.username}, email={self.email}, created_at={self.created_at})>"
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/")
+def index():
+    return render_template('index.html')
+
+@app.route("/about")
+def about():
+    return render_template('base.html')
+
+@app.route("/blog")
+def blog():
+    return render_template('base.html')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
