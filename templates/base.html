@@ -15,7 +15,7 @@
               <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
             </li>
 				<li class="nav-item">
-              <a class="nav-link" href="{{ url_for('profile') }}">Профиль</a>
+              <a class="nav-link" href="{{ url_for('user_profile', user_id=current_user.id)}}">Профиль</a>
             </li>
           		{% else %}
 				<li><a href="{{ url_for('register') }}">Регистрация </a></li>

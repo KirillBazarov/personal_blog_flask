@@ -1,4 +1,4 @@
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from cfg import *
 from DB.Models import *
 from forms import *
@@ -25,7 +25,9 @@ def login():
             # логиним пользователя
             login_user(user)
             flash('You have been logged in!', 'success')
-            return redirect(url_for('profile'))
+            user_id = current_user.id
+
+            return redirect(url_for('user_profile', user_id=current_user.id))
         else:
             flash('Login failed. Please check your email and password.', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -54,7 +56,7 @@ def register():
 
         flash('You have successfully registered!', 'success')
 
-        return redirect(url_for('profile'))
+        return redirect(url_for('index'))
 
     return render_template('register.html', form=form)
 
@@ -75,10 +77,19 @@ def index():
     posts = Post.query.all()
     return render_template('index.html', posts=posts)
 
-@app.route("/profile")
+@app.route('/profile/<int:user_id>')
 @login_required
-def profile():
-    return render_template('profile.html')
+def user_profile(user_id):
+    if user_id != current_user.id:
+        # Если пользователь пытается зайти на профиль другого пользователя,
+        # перенаправляем его на страницу своего профиля
+        flash('Вы были перенаправлены на эту страницу т.к пытались перейти на страницу другого пользователя', 'error')
+        return redirect(url_for('user_profile', user_id=current_user.id))
+    else:
+        # Если идентификатор в маршруте совпадает с идентификатором текущего пользователя,
+        # отображаем страницу профиля
+        user = User.query.get(user_id)
+        return render_template('profile.html', user=user)
 
 
 @app.errorhandler(404)
