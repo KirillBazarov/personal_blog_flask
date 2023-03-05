@@ -25,7 +25,7 @@ def login():
             # логиним пользователя
             login_user(user)
             flash('You have been logged in!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('profile'))
         else:
             flash('Login failed. Please check your email and password.', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -54,7 +54,7 @@ def register():
 
         flash('You have successfully registered!', 'success')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('profile'))
 
     return render_template('register.html', form=form)
 
@@ -74,6 +74,11 @@ def show_post(slug):
 def index():
     posts = Post.query.all()
     return render_template('index.html', posts=posts)
+
+@app.route("/profile")
+@login_required
+def profile():
+    return render_template('profile.html')
 
 
 @app.errorhandler(404)
