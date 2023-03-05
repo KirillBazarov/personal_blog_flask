@@ -167,3 +167,11 @@ form button[type="submit"] {
 form button[type="submit"]:hover {
   background-color: #0069d9;
 }
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert-danger div {
+    margin: 5px 0;
+}

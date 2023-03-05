@@ -17,6 +17,11 @@ class RegistrationForm(FlaskForm):
         if user:
             raise ValidationError('Email address already exists')
 
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
 
 class CommentForm(FlaskForm):
     body = TextAreaField('Comment', validators=[DataRequired(), Length(max=500)])

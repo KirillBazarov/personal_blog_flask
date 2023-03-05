@@ -35,3 +35,9 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def is_active(self):
+        return True
+
+    def get_id(self):
+        return str(self.id)

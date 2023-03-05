@@ -11,15 +11,26 @@
 			<ul>
 				<li><a href="{{ url_for('index') }}">Главная</a></li>
 				<li><a href="{{ url_for('register') }}">Регистрация </a></li>
+				<li><a href="{{ url_for('login') }}">войти </a></li>
 			</ul>
 		</nav>
 	</header>
 	<!-- Добавьте больше статей здесь -->
 </div>
 	<main>
+		{% with messages = get_flashed_messages() %}
+  		{% if messages %}
+    		<ul class="flashes">
+      		{% for message in messages %}
+        		<li>{{ message }}</li>
+      		{% endfor %}
+    		</ul>
+		{% endif %}
+		{% endwith %}
 		{% block content %}
 
 		{% endblock %}
+
 	</main>
 
 <!--	<footer>-->

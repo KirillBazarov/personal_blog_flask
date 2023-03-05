@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 {% block content %}
 {% for post in posts%}
 <div class="article">
@@ -7,4 +15,6 @@
   <a href="post/{{post.slug}}" class="button">Читать статью</a>
 </div>
 {%endfor%}
+
+
 {% endblock %}
