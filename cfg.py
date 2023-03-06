@@ -8,6 +8,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localh
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 
+
+app.config["RECAPTCHA_PUBLIC_KEY"] = "6LcN8NkkAAAAAJAvEFK3F9k-15J0u5mBMAezgCCZ"
+app.config["RECAPTCHA_PRIVATE_KEY"] = "6LcN8NkkAAAAAORCvkhjbCWA_s8Kn0iQ6DbXSo8G"
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
