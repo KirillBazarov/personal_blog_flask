@@ -1,8 +1,13 @@
-from flask_login import login_user, login_required, logout_user, current_user
-from forms import *
-from flask import render_template, redirect, url_for, flash, request, make_response
+import os
 
-MAX_CONTENT_LENGTH = 1024 * 1024 * 100
+
+from flask_login import login_user, login_required, logout_user, current_user
+from flask_avatars import Avatars
+from werkzeug.utils import secure_filename
+
+from forms import *
+from flask import render_template, redirect, url_for, flash, make_response, request
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -24,6 +29,7 @@ def login():
             # логиним пользователя
             login_user(user)
             flash('You have been logged in!', 'success')
+            user_id = current_user.id
 
             return redirect(url_for('user_profile', user_id=current_user.id))
         else:
@@ -52,8 +58,6 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        login_user(new_user)
-
         flash('You have successfully registered!', 'success')
 
         return redirect(url_for('index'))
@@ -78,6 +82,32 @@ def index():
     return render_template('index.html', posts=posts)
 
 
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            user = User.query.filter_by(id=1).first()  # replace with your own logic to get user
+            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'rb') as f:
+                user.avatar = f.read()
+            db.session.commit()
+            return redirect(url_for('index'))
+    return render_template('upload.html')
+
+
+@app.route('/userava')
+@login_required
+def userava():
+    img = current_user.getAvatar(app)
+    if not img:
+        return ""
+
+    h = make_response(img)
+    h.headers['Content-Type'] = 'image/png'
+    return
+
 @app.route('/profile/<int:user_id>')
 @login_required
 def user_profile(user_id):
@@ -90,43 +120,9 @@ def user_profile(user_id):
         # Если идентификатор в маршруте совпадает с идентификатором текущего пользователя,
         # отображаем страницу профиля
         user = User.query.get(user_id)
+
         return render_template('profile.html', user=user)
 
-
-@app.route('/userava')
-@login_required
-def userava():
-    img = current_user.getAvatar(app)
-    if not img:
-        return ""
-
-    h = make_response(img)
-    h.headers['Content-Type'] = 'image/png'
-    return h
-
-
-@app.route('/upload', methods=["POST", "GET"])
-@login_required
-def upload():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and current_user.verifyExt(file.filename):
-            try:
-                img = file.read()
-                user = User.query.get(current_user.id)
-
-                user.avatar = img
-
-                db.session.commit()
-                if not user:
-                    flash("Ошибка обновления аватара", "error")
-                flash("Аватар обновлен", "success")
-            except FileNotFoundError as e:
-                flash("Ошибка чтения файла", "error")
-        else:
-            flash("Ошибка обновления аватара", "error")
-
-    return redirect(url_for('user_profile', user_id=current_user.id))
 
 
 @app.errorhandler(404)

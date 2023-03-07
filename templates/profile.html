@@ -2,12 +2,18 @@
 
 {% block content %}
 {{ super() }}
-
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
 
 <table border="0" class="profile-table">
 	<tr><td valign="top">
+		{% if current_user.avatar != NONE%}
+		<div class="profile-ava"><img src="https://www.meme-arsenal.com/memes/de142ca54112d6c1d5b101e3901306bf.jpg"></div>
+		{%else%}
+		<div class="profile-ava"><img src="{{ url_for('userava') }}"></div>
+		{% endif %}
 		<div class="profile-load">
-			<div class="profile-ava"><img src="{{ url_for('userava') }}"></div>
 		<form action="{{url_for('upload')}}" method="POST" enctype="multipart/form-data">
 			<p><input type="file" name="file">
 			<p><input type="submit" value="Загрузить">
@@ -17,7 +23,8 @@
 	<td valign="top" class="profile-panel">
 		<p><a href="{{url_for('logout')}}">Выйти из профиля</a>
 		<ul class="profile-info">
-
+		<li>{{ current_user.name}}</li>
+		<li>{{ current_user.email}}</li>
 		</ul>
 	</td></tr>
 </table>

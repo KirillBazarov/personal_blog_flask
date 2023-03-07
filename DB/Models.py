@@ -1,5 +1,4 @@
 from slugify import slugify
-from sqlalchemy import LargeBinary
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from cfg import *
@@ -28,22 +27,13 @@ class User(db.Model):
     name = db.Column(db.String(50), unique=True)
     email = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(128))
-    avatar = db.Column(db.BLOB(length=4294967295))
+    avatar =  db.Column(db.LargeBinary, nullable=True)
 
     def __init__(self, name, email, password):
         self.name = name
         self.email = email
         self.password_hash = generate_password_hash(password)
         self.avatar = None
-
-
-    def verifyExt(self, filename):
-        """
-        Verify if the file has an allowed extension.
-        """
-        allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -59,3 +49,26 @@ class User(db.Model):
 
     def get_id(self):
         return str(self.id)
+
+    def verifyExt(self, filename):
+        """
+        Verify if the file has an allowed extension.
+        """
+        allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+    def update_avatar(avatar, user_id):
+        # Получаем данные POST-запроса
+
+
+        # Получаем пользователя из базы данных
+        user = User.query.filter_by(id=user_id).first()
+
+        # Обновляем аватарку пользователя
+        user.avatar = avatar.read()
+
+        # Сохраняем изменения в базе данных
+        db.session.commit()
+
+        return 'Avatar updated successfully'
