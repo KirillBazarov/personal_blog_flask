@@ -72,3 +72,6 @@ class User(db.Model):
         db.session.commit()
 
         return 'Avatar updated successfully'
+
+    def getAvatar(self,user_id):
+        user = User.query.filter_by(id=user_id).first()

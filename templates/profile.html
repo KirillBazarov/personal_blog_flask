@@ -8,9 +8,11 @@
 
 <table border="0" class="profile-table">
 	<tr><td valign="top">
-		{% if current_user.avatar != NONE%}
-		<div class="profile-ava"><img src="https://www.meme-arsenal.com/memes/de142ca54112d6c1d5b101e3901306bf.jpg"></div>
+		{% if current_user.avatar == None%}
+<!--		тут будет дефолтная ава-->
+		<div class="profile-ava"><img src="https://www.meme-arsenal.com/memes/9deabcb50a53c324b3a4981528215040.jpg" width="250" height="250">></div>
 		{%else%}
+<!--кастомная ава юзера		-->
 		<div class="profile-ava"><img src="{{ url_for('userava') }}"></div>
 		{% endif %}
 		<div class="profile-load">

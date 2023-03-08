@@ -1,8 +1,5 @@
 import os
-
-
 from flask_login import login_user, login_required, logout_user, current_user
-from flask_avatars import Avatars
 from werkzeug.utils import secure_filename
 
 from forms import *
@@ -57,6 +54,8 @@ def register():
         new_user = User(name, email, password)
         db.session.add(new_user)
         db.session.commit()
+
+        login_user(new_user)
 
         flash('You have successfully registered!', 'success')
 
