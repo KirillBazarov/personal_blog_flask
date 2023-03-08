@@ -8,13 +8,7 @@
 
 <table border="0" class="profile-table">
 	<tr><td valign="top">
-		{% if current_user.avatar == None%}
-<!--		тут будет дефолтная ава-->
-		<div class="profile-ava"><img src="https://www.meme-arsenal.com/memes/9deabcb50a53c324b3a4981528215040.jpg" width="250" height="250">></div>
-		{%else%}
-<!--кастомная ава юзера		-->
-		<div class="profile-ava"><img src="{{ url_for('userava') }}"></div>
-		{% endif %}
+		<div class="profile-ava"><img src="{{ url_for('avatar', user_id=user.id) }}" alt="Avatar"></div>
 		<div class="profile-load">
 		<form action="{{url_for('upload')}}" method="POST" enctype="multipart/form-data">
 			<p><input type="file" name="file">

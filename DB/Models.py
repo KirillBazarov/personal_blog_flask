@@ -1,3 +1,4 @@
+from flask import url_for
 from slugify import slugify
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -73,5 +74,14 @@ class User(db.Model):
 
         return 'Avatar updated successfully'
 
-    def getAvatar(self,user_id):
-        user = User.query.filter_by(id=user_id).first()
+    def getAvatar(self, app):
+        img = None
+        if not self.avatar:
+            try:
+                with app.open_resource(app.root_path + url_for('static', filename='images/default.png'), "rb") as f:
+                    img = f.read()
+            except FileNotFoundError as e:
+                print("Не найден аватар по умолчанию: "+str(e))
+        else:
+            img = self.avatar
+        return img

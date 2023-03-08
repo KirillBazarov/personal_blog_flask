@@ -1,9 +1,10 @@
+import io
 import os
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 
 from forms import *
-from flask import render_template, redirect, url_for, flash, make_response, request
+from flask import render_template, redirect, url_for, flash, make_response, request, send_file
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -81,31 +82,45 @@ def index():
     return render_template('index.html', posts=posts)
 
 
-@app.route('/upload', methods=['GET', 'POST'])
+# @app.route('/upload', methods=['GET', 'POST'])
+# def upload():
+#     if request.method == 'POST':
+#         file = request.files['file']
+#         if file:
+#             filename = secure_filename(file.filename)
+#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#             user = User.query.filter_by(id=1).first()  # replace with your own logic to get user
+#             with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'rb') as f:
+#                 user.avatar = f.read()
+#             db.session.commit()
+#
+#             flash('You have successfully changed avatar!', 'success')
+#             return redirect(url_for('index'))
+#     return render_template('upload.html')
+
+@app.route('/upload', methods=['POST'])
 def upload():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            user = User.query.filter_by(id=1).first()  # replace with your own logic to get user
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'rb') as f:
-                user.avatar = f.read()
-            db.session.commit()
-            return redirect(url_for('index'))
-    return render_template('upload.html')
+    # Получаем файл из запроса
+    file = request.files['file']
 
+    # Читаем данные из файла в байтовый объект
+    blob = file.read()
 
-@app.route('/userava')
-@login_required
-def userava():
-    img = current_user.getAvatar(app)
-    if not img:
-        return ""
+    # Сохраняем байтовый объект в базе данных для пользователя с id=1
+    user = User.query.get(current_user.id)
+    user.avatar = blob
+    db.session.commit()
 
-    h = make_response(img)
-    h.headers['Content-Type'] = 'image/png'
-    return
+    # Возвращаем ответ об успешной загрузке
+    return redirect(url_for('user_profile', user_id=current_user.id))
+
+@app.route('/avatar/<int:user_id>')
+def avatar(user_id):
+    user = User.query.get(user_id)
+    if user.avatar:
+        return send_file(io.BytesIO(user.avatar), mimetype='image/jpeg')
+    else:
+        return send_file('static/images/default.jpg', mimetype='image/jpeg')
 
 @app.route('/profile/<int:user_id>')
 @login_required
