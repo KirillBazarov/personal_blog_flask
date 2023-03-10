@@ -8,7 +8,7 @@
 
 <table border="0" class="profile-table">
 	<tr><td valign="top">
-		<div class="profile-ava"><img src="{{ url_for('avatar', user_id=user.id) }}" alt="Avatar"></div>
+		<div class="profile-ava"><img src="{{ url_for('avatar', user_id=user.id) }}"  width="250" height="250" alt="Avatar"></div>
 		<div class="profile-load">
 		<form action="{{url_for('upload')}}" method="POST" enctype="multipart/form-data">
 			<p><input type="file" name="file">
@@ -17,10 +17,9 @@
 		</div>
 	</td>
 	<td valign="top" class="profile-panel">
-		<p><a href="{{url_for('logout')}}">Выйти из профиля</a>
 		<ul class="profile-info">
-		<li>{{ current_user.name}}</li>
-		<li>{{ current_user.email}}</li>
+		<li>имя:{{ current_user.name}}</li>
+		<li>email:{{ current_user.email}}</li>
 		</ul>
 	</td></tr>
 </table>

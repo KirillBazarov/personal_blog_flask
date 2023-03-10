@@ -1,10 +1,8 @@
 import io
-import os
 from flask_login import login_user, login_required, logout_user, current_user
-from werkzeug.utils import secure_filename
 
 from forms import *
-from flask import render_template, redirect, url_for, flash, make_response, request, send_file
+from flask import render_template, redirect, url_for, flash, request, send_file
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -27,8 +25,6 @@ def login():
             # логиним пользователя
             login_user(user)
             flash('You have been logged in!', 'success')
-            user_id = current_user.id
-
             return redirect(url_for('user_profile', user_id=current_user.id))
         else:
             flash('Login failed. Please check your email and password.', 'danger')
@@ -82,22 +78,6 @@ def index():
     return render_template('index.html', posts=posts)
 
 
-# @app.route('/upload', methods=['GET', 'POST'])
-# def upload():
-#     if request.method == 'POST':
-#         file = request.files['file']
-#         if file:
-#             filename = secure_filename(file.filename)
-#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#             user = User.query.filter_by(id=1).first()  # replace with your own logic to get user
-#             with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'rb') as f:
-#                 user.avatar = f.read()
-#             db.session.commit()
-#
-#             flash('You have successfully changed avatar!', 'success')
-#             return redirect(url_for('index'))
-#     return render_template('upload.html')
-
 @app.route('/upload', methods=['POST'])
 def upload():
     # Получаем файл из запроса
@@ -117,10 +97,11 @@ def upload():
 @app.route('/avatar/<int:user_id>')
 def avatar(user_id):
     user = User.query.get(user_id)
+    print(user.avatar)
     if user.avatar:
         return send_file(io.BytesIO(user.avatar), mimetype='image/jpeg')
     else:
-        return send_file('static/images/default.jpg', mimetype='image/jpeg')
+        return send_file('static/images/default.png', mimetype='image/jpeg')
 
 @app.route('/profile/<int:user_id>')
 @login_required
@@ -142,6 +123,7 @@ def user_profile(user_id):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
 
 
 if __name__ == '__main__':

@@ -5,18 +5,21 @@
   <h1>{{post.title}}</h1>
         <h2>{{post.content}}</h2>
        <h2>{{post.id}}</h2>
-
 </div>
 
-<h2>Comments</h2>
-  <ul>
-    {% for comment in post.comments %}
-      <li>
-        <p><strong>{{ comment.name }}:</strong> {{ comment.body }}</p>
-        <p><small>{{ comment.timestamp }}</small></p>
-      </li>
-    {% endfor %}
-  </ul>
+
+<div class="comments">
+  <h2>Комментарии</h2>
+        {% for comment in post.comm %}
+  <div class="comment">
+    <span class="comment-author">{{comment.author.name}}</span>
+  </div>
+  <div class="comment">
+    <p>{{comment.content}}</p>
+  </div>
+    {%endfor%}
+  <!-- Здесь может быть больше комментариев -->
+</div>
 
   <h3>Add Comment</h3>
   <form method="post">
