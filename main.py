@@ -61,14 +61,18 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/post/<slug>')
+@app.route('/post/<slug>', methods=['GET', 'POST'])
 def show_post(slug):
     # получить пост из базы данных по слагу
     post = Post.query.filter_by(slug=slug).first()
 
-    # создать форму для комментария
+    # создать форму для комментари
     form = CommentForm()
-
+    if form.validate_on_submit():
+        comment = Comment(content=form.content.data, post_id=post.id, user_id = current_user.id)
+        db.session.add(comment)
+        db.session.commit()
+        return redirect(url_for('show_post', slug=post.slug))
     return render_template('post_detail.html', post=post, form=form)
 
 

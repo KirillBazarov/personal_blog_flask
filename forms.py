@@ -27,4 +27,5 @@ class LoginForm(FlaskForm):
 
 
 class CommentForm(FlaskForm):
-    body = TextAreaField('Comment', validators=[DataRequired(), Length(max=500)])
+    content = StringField('Comment', validators=[DataRequired()])
+    submit = SubmitField('Submit')
