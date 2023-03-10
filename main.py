@@ -73,13 +73,13 @@ def show_post(slug):
         db.session.add(comment)
         db.session.commit()
         return redirect(url_for('show_post', slug=post.slug))
-    return render_template('post_detail.html', post=post, form=form)
+    return render_template('post_detail.html', title = f"Пост {post.title}",post=post, form=form)
 
 
 @app.route("/")
 def index():
     posts = Post.query.all()
-    return render_template('index.html', posts=posts)
+    return render_template('index.html', posts=posts, title='Главная страница')
 
 
 @app.route('/upload', methods=['POST'])
@@ -120,7 +120,7 @@ def user_profile(user_id):
         # отображаем страницу профиля
         user = User.query.get(user_id)
 
-        return render_template('profile.html', user=user)
+        return render_template('profile.html', user=user, title=f'профиль {user.name}')
 
 
 
