@@ -8,7 +8,7 @@ from utils import normal_data
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
+app.config['CACHE_TYPE'] = 'simple'
 cache = Cache(app)
 
 
