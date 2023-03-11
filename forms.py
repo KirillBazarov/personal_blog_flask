@@ -29,3 +29,9 @@ class LoginForm(FlaskForm):
 class CommentForm(FlaskForm):
     content = StringField('Comment', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+
+class PostForm(FlaskForm):
+    title =StringField('Title', validators=[DataRequired()])
+    content = StringField('Post', validators=[DataRequired()])
+    submit = SubmitField('Submit')

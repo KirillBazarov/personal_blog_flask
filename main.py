@@ -123,6 +123,15 @@ def user_profile(user_id):
         return render_template('profile.html', user=user, title=f'профиль {user.name}')
 
 
+@app.route("/add", methods=['GET', 'POST'])
+def add_page():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(content=form.content.data, title=form.title.data, user_id = current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        return redirect(url_for('show_post', slug=post.slug))
+    return render_template('add_post.html',form=form)
 
 @app.errorhandler(404)
 def page_not_found(e):

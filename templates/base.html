@@ -16,7 +16,9 @@
             </li>
 				<li class="nav-item">
               <a class="nav-link" href="{{ url_for('user_profile', user_id=current_user.id)}}">Профиль</a>
+
             </li>
+				<li><a href="{{ url_for('add_page') }}">Добавить пост </a></li>
           		{% else %}
 				<li><a href="{{ url_for('register') }}">Регистрация </a></li>
 				<li><a href="{{ url_for('login') }}">Войти </a></li>

@@ -2,7 +2,7 @@ from cfg import *
 from Models import *
 
 posts = [
-    Post(title='3 gjст',content="ну тут меньшу 50 символов",user_id = 2),
+    Post(title='3аыфвавфыFsadf',content="ну тут меньшу 50 символов",user_id = 2),
 ]
 
 # users = [
