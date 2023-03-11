@@ -1,11 +1,15 @@
 import io
 from flask_login import login_user, login_required, logout_user, current_user
 from forms import *
+from flask_caching import Cache
 from flask import render_template, redirect, url_for, flash, request, send_file
 from utils import normal_data
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+cache = Cache(app)
 
 
 @app.route("/")
@@ -131,6 +135,7 @@ def user_profile(user_id):
 
 
 @app.route("/add", methods=['GET', 'POST'])
+@cache.cached(timeout=60 * 5)
 def add_page():
     form = PostForm()
     if form.validate_on_submit():
