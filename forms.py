@@ -1,7 +1,6 @@
-from wtforms import TextAreaField
 from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, ValidationError, EqualTo
+from wtforms.validators import DataRequired, Email, ValidationError, EqualTo
 from DB.Models import *
 
 

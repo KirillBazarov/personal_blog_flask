@@ -1,10 +1,8 @@
 from datetime import datetime
-
 from flask import url_for
 from slugify import slugify
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from cfg import *
 
 
@@ -17,7 +15,6 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-
     def __init__(self, title, content, user_id):
         self.title = title
         self.slug = slugify(title)
@@ -29,21 +26,16 @@ class Post(db.Model):
         return cls.query.filter_by(slug=slug).first()
 
 
-
-
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     email = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(128))
-    avatar =  db.Column(db.LargeBinary, nullable=True)
-
-
+    avatar = db.Column(db.LargeBinary, nullable=True)
 
     posts = relationship('Post', backref='author')
     comments = relationship('Comment', backref='author')
-
 
     def __init__(self, name, email, password):
         self.name = name
@@ -75,16 +67,8 @@ class User(db.Model):
                filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
     def update_avatar(avatar, user_id):
-        # Получаем данные POST-запроса
-
-
-        # Получаем пользователя из базы данных
         user = User.query.filter_by(id=user_id).first()
-
-        # Обновляем аватарку пользователя
         user.avatar = avatar.read()
-
-        # Сохраняем изменения в базе данных
         db.session.commit()
 
         return 'Avatar updated successfully'
@@ -96,10 +80,11 @@ class User(db.Model):
                 with app.open_resource(app.root_path + url_for('static', filename='images/default.png'), "rb") as f:
                     img = f.read()
             except FileNotFoundError as e:
-                print("Не найден аватар по умолчанию: "+str(e))
+                print("Не найден аватар по умолчанию: " + str(e))
         else:
             img = self.avatar
         return img
+
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -110,4 +95,3 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
 
     comments = relationship('Post', backref='comm')
-

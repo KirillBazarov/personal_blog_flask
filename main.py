@@ -1,8 +1,8 @@
 import io
-import arrow
 from flask_login import login_user, login_required, logout_user, current_user
 from forms import *
 from flask import render_template, redirect, url_for, flash, request, send_file
+from utils import normal_data
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -13,11 +13,6 @@ def index():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
     return render_template('index.html', posts=posts.items, pagination=posts, title='Главная страница')
-
-
-def normal_data(data):
-    utc = arrow.get(data)
-    return utc.humanize(locale='ru')
 
 
 @app.context_processor
@@ -113,7 +108,6 @@ def upload():
 @app.route('/avatar/<int:user_id>')
 def avatar(user_id):
     user = User.query.get(user_id)
-    print(user.avatar)
     if user.avatar:
         return send_file(io.BytesIO(user.avatar), mimetype='image/jpeg')
     else:
