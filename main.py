@@ -1,11 +1,28 @@
 import io
+import arrow
 from flask_login import login_user, login_required, logout_user, current_user
-
 from forms import *
 from flask import render_template, redirect, url_for, flash, request, send_file
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+@app.route("/")
+def index():
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
+    return render_template('index.html', posts=posts.items, pagination=posts, title='Главная страница')
+
+
+def normal_data(data):
+    utc = arrow.get(data)
+    return utc.humanize(locale='ru')
+
+
+@app.context_processor
+def inject_functions():
+    return dict(normal_data=normal_data)
 
 
 @login_manager.user_loader
@@ -69,17 +86,11 @@ def show_post(slug):
     # создать форму для комментари
     form = CommentForm()
     if form.validate_on_submit():
-        comment = Comment(content=form.content.data, post_id=post.id, user_id = current_user.id)
+        comment = Comment(content=form.content.data, post_id=post.id, user_id=current_user.id)
         db.session.add(comment)
         db.session.commit()
         return redirect(url_for('show_post', slug=post.slug))
-    return render_template('post_detail.html', title = f"Пост {post.title}",post=post, form=form)
-
-
-@app.route("/")
-def index():
-    posts = Post.query.all()
-    return render_template('index.html', posts=posts, title='Главная страница')
+    return render_template('post_detail.html', title=f"Пост {post.title}", post=post, form=form)
 
 
 @app.route('/upload', methods=['POST'])
@@ -98,6 +109,7 @@ def upload():
     # Возвращаем ответ об успешной загрузке
     return redirect(url_for('user_profile', user_id=current_user.id))
 
+
 @app.route('/avatar/<int:user_id>')
 def avatar(user_id):
     user = User.query.get(user_id)
@@ -106,6 +118,7 @@ def avatar(user_id):
         return send_file(io.BytesIO(user.avatar), mimetype='image/jpeg')
     else:
         return send_file('static/images/default.png', mimetype='image/jpeg')
+
 
 @app.route('/profile/<int:user_id>')
 @login_required
@@ -127,16 +140,16 @@ def user_profile(user_id):
 def add_page():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(content=form.content.data, title=form.title.data, user_id = current_user.id)
+        post = Post(content=form.content.data, title=form.title.data, user_id=current_user.id)
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('show_post', slug=post.slug))
-    return render_template('add_post.html',form=form)
+    return render_template('add_post.html', form=form)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
-
 
 
 if __name__ == '__main__':
