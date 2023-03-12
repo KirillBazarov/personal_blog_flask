@@ -77,9 +77,17 @@ def register():
     return render_template('register.html', form=form)
 
 
+@app.route('/posts/<slug>', methods=['POST'])
+def delete_post(slug):
+    post_to_delete = Post.query.filter_by(slug=slug).first_or_404()
+    db.session.delete(post_to_delete)
+    db.session.commit()
+
+    flash('You have successfully deleted your post!', 'success')
+
+    return redirect(url_for('index'))
 @app.route('/post/<slug>', methods=['GET', 'POST'])
 def show_post(slug):
-    # получить пост из базы данных по слагу
     post = Post.query.filter_by(slug=slug).first()
 
     # создать форму для комментари
@@ -89,7 +97,7 @@ def show_post(slug):
         db.session.add(comment)
         db.session.commit()
         return redirect(url_for('show_post', slug=post.slug))
-    return render_template('post_detail.html', title=f"Пост {post.title}", post=post, form=form)
+    return render_template('post_detail.html', title=f"Пост {post.title}", post=post, form=form, user_id=current_user.id)
 
 
 @app.route('/upload', methods=['POST'])
@@ -135,7 +143,6 @@ def user_profile(user_id):
 
 
 @app.route("/add", methods=['GET', 'POST'])
-@cache.cached(timeout=60 * 5)
 def add_page():
     form = PostForm()
     if form.validate_on_submit():
