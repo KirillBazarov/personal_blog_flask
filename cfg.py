@@ -10,6 +10,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 
 
+app.config['CACHE_TYPE'] = 'simple'
+
+
 app.config["RECAPTCHA_PUBLIC_KEY"] = "6LcN8NkkAAAAAJAvEFK3F9k-15J0u5mBMAezgCCZ"
 app.config["RECAPTCHA_PRIVATE_KEY"] = "6LcN8NkkAAAAAORCvkhjbCWA_s8Kn0iQ6DbXSo8G"
 

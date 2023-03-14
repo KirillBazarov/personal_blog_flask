@@ -23,7 +23,18 @@ class Post(db.Model):
 
     @classmethod
     def get_by_slug(cls, slug):
-        return cls.query.filter_by(slug=slug).first()
+        post = Post.query.filter_by(slug=slug).first()
+        return post
+
+    @classmethod
+    def delete_post(self,slug):
+        post_to_delete = Post.query.filter_by(slug=slug).first_or_404()
+        comments_to_delete = Comment.query.filter_by(post_id=post_to_delete.id).all()
+        for comment in comments_to_delete:
+            db.session.delete(comment)
+        db.session.delete(post_to_delete)
+        db.session.commit()
+
 
 
 class User(db.Model):
@@ -85,6 +96,16 @@ class User(db.Model):
             img = self.avatar
         return img
 
+    @classmethod
+    def add_user(cls,name, email, password):
+        new_user = cls(name=name, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
+
+    def count_user_posts(id):
+        user_count = Post.query.filter_by(user_id=id).count()
+        return user_count
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -95,3 +116,25 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
 
     comments = relationship('Post', backref='comm')
+
+    @classmethod
+    def add_comment(cls, content, post_id, user_id):
+        comment = cls(content=content, post_id=post_id, user_id=user_id)
+        db.session.add(comment)
+        db.session.commit()
+
+
+    @classmethod
+    def delete_comment_id(cls, id):
+        comment = cls.query.filter_by(id=id).first()
+        db.session.delete(comment)
+        db.session.commit()
+
+class PostLikes(db.Model):
+    __tablename__ = 'post_likes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    post_likes = relationship('Post', backref='likes')

@@ -8,7 +8,6 @@ from utils import normal_data
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-app.config['CACHE_TYPE'] = 'simple'
 cache = Cache(app)
 
 
@@ -21,7 +20,7 @@ def index():
 
 @app.context_processor
 def inject_functions():
-    return dict(normal_data=normal_data)
+    return dict(normal_data=normal_data, count_user_posts=User.count_user_posts)
 
 
 @login_manager.user_loader
@@ -29,12 +28,11 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# создаем представление для логина
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        # ищем пользователя в базе данных
+
         user = User.query.filter_by(email=form.email.data).first()
         # проверяем правильность пароля
         if user and user.check_password(form.password.data):
@@ -59,45 +57,41 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        name = form.name.data
-        email = form.email.data
-        password = form.password.data
-
-        # Create new user
-        new_user = User(name, email, password)
-        db.session.add(new_user)
-        db.session.commit()
-
+        new_user = User.add_user(name=form.name.data, email=form.email.data, password=form.password.data)
         login_user(new_user)
 
         flash('You have successfully registered!', 'success')
 
         return redirect(url_for('index'))
 
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, title="регистрация")
 
 
-@app.route('/posts/<slug>', methods=['POST'])
+@app.route('/delete_posts/<slug>', methods=['POST'])
 def delete_post(slug):
-    post_to_delete = Post.query.filter_by(slug=slug).first_or_404()
-    db.session.delete(post_to_delete)
-    db.session.commit()
-
+    # сделать так что бы когда удалял пост удалялись все комменты к посту
+    Post.delete_post(slug)
     flash('You have successfully deleted your post!', 'success')
 
     return redirect(url_for('index'))
+
+
+@app.route('/delete_comment/<int:id>/<path:slug>', methods=['POST'])
+def delete_comment(id, slug):
+    Comment.delete_comment_id(id)
+    flash('You have successfully deleted your comment!', 'success')
+
+    return redirect(url_for('show_post', slug=slug))
+
 @app.route('/post/<slug>', methods=['GET', 'POST'])
 def show_post(slug):
-    post = Post.query.filter_by(slug=slug).first()
-
-    # создать форму для комментари
+    post = Post.get_by_slug(slug)
     form = CommentForm()
     if form.validate_on_submit():
-        comment = Comment(content=form.content.data, post_id=post.id, user_id=current_user.id)
-        db.session.add(comment)
-        db.session.commit()
+        Comment.add_comment(content=form.content.data, post_id=post.id, user_id=current_user.id)
         return redirect(url_for('show_post', slug=post.slug))
-    return render_template('post_detail.html', title=f"Пост {post.title}", post=post, form=form, user_id=current_user.id)
+    return render_template('post_detail.html', title=f"Пост {post.title}", post=post, form=form,
+                           user_id=current_user.id)
 
 
 @app.route('/upload', methods=['POST'])
@@ -134,12 +128,7 @@ def user_profile(user_id):
         # перенаправляем его на страницу своего профиля
         flash('Вы были перенаправлены на эту страницу т.к пытались перейти на страницу другого пользователя', 'error')
         return redirect(url_for('user_profile', user_id=current_user.id))
-    else:
-        # Если идентификатор в маршруте совпадает с идентификатором текущего пользователя,
-        # отображаем страницу профиля
-        user = User.query.get(user_id)
-
-        return render_template('profile.html', user=user, title=f'профиль {user.name}')
+    return render_template('profile.html', title=f'профиль {current_user.name}', user_id=user_id)
 
 
 @app.route("/add", methods=['GET', 'POST'])
@@ -150,7 +139,7 @@ def add_page():
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('show_post', slug=post.slug))
-    return render_template('add_post.html', form=form)
+    return render_template('add_post.html', form=form, title = "Добавить пост")
 
 
 @app.errorhandler(404)

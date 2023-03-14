@@ -5,7 +5,41 @@
   <h1>{{post.title}}</h1>
         <h2>{{post.content}}</h2>
        <h2>{{post.id}}</h2>
-{% if post.user_id == user_id %}
+      <h2>поставить лайк </h2>
+<!-- Шаблон для кнопок лайк и дислайк -->
+<!-- Шаблон для кнопок лайк и дислайк -->
+<div class="like-buttons">
+  <button class="like-button" data-action="like"><img src="{{ url_for('static', filename='thumbs-up.png') }}" alt="Like"></button>
+  <span class="like-count">{{ post.like_count }}</span>
+  <button class="like-button" data-action="dislike"><img src="{{ url_for('static', filename='thumbs-down.png') }}" alt="Dislike"></button>
+  <span class="dislike-count">{{ post.dislike_count }}</span>
+</div>
+
+<!-- Скрипт для обработки нажатий на кнопки и отправки данных на сервер -->
+<script>
+  const likeButtons = document.querySelectorAll('.like-button');
+  likeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.action;
+      const postId = '{{ post.id }}'; // здесь нужно передать ID поста, для которого нажата кнопка
+      const url = `/like/${postId}/${action}`; // формируем URL для отправки запроса
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          // обновляем информацию о количестве лайков и дизлайков на странице
+          const likeCount = document.querySelector('.like-count');
+          const dislikeCount = document.querySelector('.dislike-count');
+          likeCount.textContent = data.like_count;
+          dislikeCount.textContent = data.dislike_count;
+        })
+        .catch(error => console.error(error));
+    });
+  });
+</script>
+
+
+     {% if post.user_id == user_id %}
 <form action="{{ url_for('delete_post', slug=post.slug) }}" method="POST">
   <input type="hidden" name="_method" value="DELETE">
   <button type="submit" class="btn btn-danger">Удалить пост</button>
@@ -23,6 +57,12 @@
   <div class="comment">
     <p>{{comment.content}}</p>
   </div>
+     {% if comment.user_id == user_id %}
+        <form action="{{ url_for('delete_comment', id=comment.id, slug=post.slug) }}" method="POST">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit" class="btn btn-danger">Удалить коммент</button>
+</form>
+        {% endif %}
     {%endfor%}
   <!-- Здесь может быть больше комментариев -->
 </div>
